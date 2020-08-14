@@ -3,6 +3,7 @@ import { TypegooseModule } from 'nestjs-typegoose';
 import { UserModule } from '../user/user.module';
 import { SnowflakeService } from '../snowflake/snowflake.service';
 import { SnowflakeModule } from '../snowflake/snowflake.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -12,7 +13,8 @@ import { SnowflakeModule } from '../snowflake/snowflake.module';
     }),
 
     SnowflakeModule,
-    UserModule
+    UserModule,
+    AuthModule
   ],
 
   providers: [SnowflakeService]
