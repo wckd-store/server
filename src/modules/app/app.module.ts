@@ -7,9 +7,10 @@ import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
-    TypegooseModule.forRoot("mongodb://localhost:27017/", {
+    TypegooseModule.forRoot('mongodb://localhost:27017/', {
       useNewUrlParser: true,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
+      useCreateIndex: true
     }),
 
     SnowflakeModule,
