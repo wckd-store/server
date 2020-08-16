@@ -6,7 +6,6 @@ export class UserExistsException extends ExistingDocumentException {
   }
 }
 export const EMAIL_USER_EXISTS_ERROR = new UserExistsException("email");
-export const ID_USER_EXISTS_ERROR = new UserExistsException("id");
 
 export class UserDoesntExistException extends NonExistingDocumentException {
   constructor (field: string) {

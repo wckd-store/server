@@ -1,11 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { User } from './user.entity';
-import { UserCreateDto, UserUpdateDto } from './user.dto';
+import { UserCreateDto, UserResponseDto, UserUpdateDto } from './user.dto';
 import {
   EMAIL_USER_EXISTS_ERROR,
   ID_USER_DOESNT_EXIST_ERROR,
 } from './user.exception';
+import { Authenticated } from '../../common/nest/decorators/authenticated.decorator';
+import { AuthenticatedGuard } from '../../common/nest/guards/authenticated.guard';
 
 @Controller('user')
 export class UserController {
@@ -16,40 +17,51 @@ export class UserController {
   }
 
   @Get()
-  async index(): Promise<User[]> {
-    return await this.userService.findAll();
+  @Authenticated()
+  async index(): Promise<UserResponseDto[]> {
+    const userArray = await this.userService.findAll();
+    return userArray.map(user => UserResponseDto.fromUser(user));
   }
 
   @Post()
-  async create(@Body() userCreateDto: UserCreateDto): Promise<User> {
+  @HttpCode(HttpStatus.CREATED)
+  async create(@Body() userCreateDto: UserCreateDto): Promise<UserResponseDto> {
     if (await this.userService.existsByEmail(userCreateDto.email))
       throw EMAIL_USER_EXISTS_ERROR;
 
-    return await this.userService.create(userCreateDto);
+    const user = await this.userService.create(userCreateDto);
+    return UserResponseDto.fromUser(user);
   }
 
   @Get(':id')
-  async retrieve(@Param('id') id): Promise<User> {
+  @HttpCode(HttpStatus.FOUND)
+  async retrieve(@Param('id') id): Promise<UserResponseDto> {
     if (!await this.userService.existsById(id))
       throw ID_USER_DOESNT_EXIST_ERROR;
 
-    return await this.userService.findById(id);
+    const user = await this.userService.findById(id);
+    return UserResponseDto.fromUser(user);
   }
 
   @Put(':id')
-  async update(@Param('id') id, @Body() userUpdateDto: UserUpdateDto): Promise<User> {
+  @HttpCode(HttpStatus.FOUND)
+  async update(@Param('id') id, @Body() userUpdateDto: UserUpdateDto): Promise<UserResponseDto> {
     if (!await this.userService.existsById(id))
       throw ID_USER_DOESNT_EXIST_ERROR;
 
-    return await this.userService.updateById(id, userUpdateDto);
+    const updatedUser = await this.userService.updateById(id, userUpdateDto);
+    const user = await this.userService.findById(updatedUser.id);
+    return UserResponseDto.fromUser(user);
   }
 
   @Delete(':id')
-  async destroy(@Param('id') id): Promise<User> {
+  @HttpCode(HttpStatus.FOUND)
+  async destroy(@Param('id') id): Promise<UserResponseDto> {
     if (!await this.userService.existsById(id))
       throw ID_USER_DOESNT_EXIST_ERROR;
 
-    return await this.userService.deleteById(id);
+    const user = await this.userService.deleteById(id);
+    return UserResponseDto.fromUser(user);
   }
 
 }

@@ -1,6 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './modules/app/app.module';
 import * as dotenv from 'dotenv';
+
+import { AppModule } from './modules/app/app.module';
+
 import { ValidationPipe } from './common/nest/pipes/validation.pipe';
 import { ValidationExceptionFilter } from './common/nest/filters/validation.filter';
 import { HttpExceptionFilter } from './common/nest/filters/exception.filter';
@@ -12,7 +14,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix('apiv1');
 
-  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalFilters(new HttpExceptionFilter())
 
   app.useGlobalPipes(new ValidationPipe())
   app.useGlobalFilters(new ValidationExceptionFilter())
